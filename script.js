@@ -156,6 +156,9 @@ async function getWeather(city) {
     showWeather(data);
     changeBackground(data.weather[0].main);
     getForecast(city);
+
+    localStorage.setItem("lastCity", city);
+
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -179,3 +182,12 @@ async function getForecast(city) {
     console.log("Forecast error:", err.message);
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lastCity = localStorage.getItem("lastCity");
+
+  if (lastCity) {
+    cityInput.value = lastCity;
+    getWeather(lastCity);
+  }
+})

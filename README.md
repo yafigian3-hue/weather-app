@@ -50,7 +50,7 @@ Lihat aplikasi yang sudah berjalan di sini:
     ```
 3.  **⚠️ Setup**
     Ganti YOUR_API_KEY di script.js dengan API key dari OpenWeather.
-    ```
+    
 4.  **Jalankan Aplikasi**
     Langsung buka file `index.html` di browser favorit Anda.
 
