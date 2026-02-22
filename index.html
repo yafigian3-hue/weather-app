@@ -20,8 +20,9 @@
     </style>
   </head>
   <body
-    class="bg-slate-900 text-white flex items-center justify-center h-screen transition-colors duration-500"
+    class="bg-slate-900 text-white min-h-screen flex items-center justify-center transition-colors duration-500"
   >
+  
     <div
       id="bgLayer"
       class="fixed inset-0 -z-10 opacity-100 transition-opacity duration-700"
@@ -37,6 +38,13 @@
         placeholder="Masukkan kota"
         class="w-full p-2 rounded-lg text-black mb-3"
       />
+
+      <button
+        id="detectBtn"
+        class="bg-white/10 hover:bg-white/20 w-full py-2 rounded-lg font-semibold mt-2 transition"
+      >
+        📍 Detect Location
+      </button>
 
       <button
         id="searchBtn"

@@ -158,7 +158,6 @@ async function getWeather(city) {
     getForecast(city);
 
     localStorage.setItem("lastCity", city);
-
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -184,10 +183,81 @@ async function getForecast(city) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const lastCity = localStorage.getItem("lastCity");
-
-  if (lastCity) {
-    cityInput.value = lastCity;
-    getWeather(lastCity);
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        getWeatherByCoords(latitude, longitude);
+      },
+      () => {
+        const lastCity = localStorage.getItem("lastCity");
+        if (lastCity) {
+          cityInput.value = lastCity;
+          getWeather(lastCity);
+        }
+      },
+    );
+  } else {
+    const lastCity = localStorage.getItem("lastCity");
+    if (lastCity) {
+      cityInput.value = lastCity;
+      getWeather(lastCity);
+    }
   }
-})
+});
+
+async function getWeatherByCoords(lat, lon) {
+  loading.classList.remove("hidden");
+  error.classList.add("hidden");
+  weatherResult.innerHTML = "";
+  document.getElementById("forecast").innerHTML = "";
+
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+
+    showWeather(data);
+    changeBackground(data.weather[0].main); // FIXED
+    getForecastByCoords(lat, lon);
+
+    localStorage.setItem("lastCity", data.name);
+  } catch (err) {
+    error.textContent = err.message;
+    error.classList.remove("hidden");
+  } finally {
+    loading.classList.add("hidden");
+  }
+}
+
+async function getForecastByCoords(lat, lon) {
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+
+    showForecast(data);
+  } catch (err) {
+    console.log("Forecast error:", err.message);
+  }
+}
+
+document.getElementById("detectBtn").addEventListener("click", () => {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      getWeatherByCoords(latitude, longitude);
+    },
+    () => {
+      alert("Lokasi tidak diizinkan");
+    },
+  );
+});
