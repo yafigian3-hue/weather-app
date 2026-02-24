@@ -1,5 +1,5 @@
 let tempChart = null;
-const apiKey = "YOUR_API_KEY";
+const apiKey = "YOUR_API_KEY"; // ganti denngan API key kamu sendiri dari OpenWeatherMap
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -26,45 +26,50 @@ cityInput.addEventListener("keypress", (e) => {
 // ================= WEATHER =================
 
 function showWeather(data) {
-  const icon = data.weather[0].icon;
-  const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+  const iconUrl = getWeatherImage(data.weather[0].main);
 
   weatherResult.innerHTML = `
-    <div id="weatherCard"
-      class="fade-enter bg-white/10 backdrop-blur-md p-5 rounded-2xl mt-4 shadow-xl">
+  <div id="weatherCard"
+    class="fade-enter bg-white/10 backdrop-blur-md p-6 rounded-2xl mt-4 shadow-2xl">
 
-      <h2 class="text-lg font-semibold">
-        ${data.name}, ${data.sys.country}
-      </h2>
+    <h2 class="text-xl font-semibold text-center mb-4">
+      ${data.name}, ${data.sys.country}
+    </h2>
 
-      <div class="flex items-center justify-center gap-3 mt-2">
-        <img src="${iconUrl}" class="w-16 h-16">
-        <p class="text-5xl font-bold">
-          ${Math.round(data.main.temp)}°C
-        </p>
-      </div>
+    <div class="flex flex-col items-center justify-center gap-2">
 
-      <p class="capitalize text-gray-300 mt-2 text-sm">
+      <img src="${iconUrl}" 
+        class="w-24 h-24 drop-shadow-lg">
+
+      <p class="text-6xl font-bold leading-none">
+        ${Math.round(data.main.temp)}°C
+      </p>
+
+      <p class="capitalize text-gray-300 text-sm">
         ${data.weather[0].description}
       </p>
 
-      <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
-        <div class="bg-white/5 p-3 rounded-xl">
-          <p class="text-gray-400">Humidity</p>
-          <p class="font-semibold text-lg">
-            ${data.main.humidity}%
-          </p>
-        </div>
-
-        <div class="bg-white/5 p-3 rounded-xl">
-          <p class="text-gray-400">Wind</p>
-          <p class="font-semibold text-lg">
-            ${data.wind.speed} m/s
-          </p>
-        </div>
-      </div>
     </div>
-  `;
+
+    <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+
+      <div class="bg-white/5 p-4 rounded-xl text-center">
+        <p class="text-gray-400">Humidity</p>
+        <p class="font-semibold text-xl">
+          ${data.main.humidity}%
+        </p>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl text-center">
+        <p class="text-gray-400">Wind</p>
+        <p class="font-semibold text-xl">
+          ${data.wind.speed} m/s
+        </p>
+      </div>
+
+    </div>
+  </div>
+`;
 
   // Trigger animation
   setTimeout(() => {
@@ -73,6 +78,19 @@ function showWeather(data) {
       card.classList.add("fade-enter-active");
     }
   }, 50);
+}
+
+function getWeatherImage(weatherMain) {
+  const images = {
+    Clear: "https://cdn-icons-png.flaticon.com/512/869/869869.png",
+    Clouds: "https://cdn-icons-png.flaticon.com/512/414/414825.png",
+    Rain: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png",
+    Thunderstorm: "https://cdn-icons-png.flaticon.com/512/1146/1146860.png",
+    Drizzle: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png",
+    Snow: "https://cdn-icons-png.flaticon.com/512/642/642102.png",
+  };
+
+  return images[weatherMain] || images["Clouds"];
 }
 
 // ================= FORECAST =================
@@ -91,14 +109,13 @@ function showForecast(data) {
       weekday: "short",
     });
 
-    const icon = day.weather[0].icon;
-    const iconUrl = `https://openweathermap.org/img/wn/${icon}.png`;
+    const iconUrl = getWeatherImage(day.weather[0].main);
 
     forecastContainer.innerHTML += `
       <div class="fade-enter bg-white/10 hover:bg-white/20
         p-3 rounded-xl text-center">
         <p class="font-medium">${dayName}</p>
-        <img src="${iconUrl}" class="mx-auto w-10 h-10">
+        <img src="${iconUrl}" class="mx-auto w-12 h-12 drop-shadow-md">
         <p class="font-semibold mt-1">
           ${Math.round(day.main.temp)}°C
         </p>
@@ -106,7 +123,7 @@ function showForecast(data) {
     `;
   });
 
-  // Trigger animation forecast
+  
   setTimeout(() => {
     forecastContainer.querySelectorAll(".fade-enter").forEach((el) => {
       el.classList.add("fade-enter-active");
@@ -114,9 +131,46 @@ function showForecast(data) {
   }, 50);
 }
 
+function getChartGradient(ctx, weatherMain) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+
+  if (weatherMain === "Clear") {
+    gradient.addColorStop(0, "rgba(255, 200, 0, 0.6)");
+    gradient.addColorStop(1, "rgba(255, 140, 0, 0)");
+  } else if (weatherMain === "Clouds") {
+    gradient.addColorStop(0, "rgba(180, 180, 180, 0.5)");
+    gradient.addColorStop(1, "rgba(100, 100, 100, 0)");
+  } else if (weatherMain === "Rain") {
+    gradient.addColorStop(0, "rgba(0, 150, 255, 0.5)");
+    gradient.addColorStop(1, "rgba(0, 50, 120, 0)");
+  } else if (weatherMain === "Thunderstorm") {
+    gradient.addColorStop(0, "rgba(150, 0, 255, 0.5)");
+    gradient.addColorStop(1, "rgba(50, 0, 80, 0)");
+  } else {
+    gradient.addColorStop(0, "rgba(120, 120, 120, 0.5)");
+    gradient.addColorStop(1, "rgba(60, 60, 60, 0)");
+  }
+
+  return gradient;
+}
+
+function getChartBorderColor(weatherMain) {
+  if (weatherMain === "Clear") {
+    return "#f97316"; 
+  } else if (weatherMain === "Clouds") {
+    return "#9ca3af";
+  } else if (weatherMain === "Rain") {
+    return "#3b82f6"; 
+  } else if (weatherMain === "Thunderstorm") {
+    return "#8b5cf6";
+  } else {
+    return "#cbd5e1"; 
+  }
+}
+
 // ================= Render Temperature Chart =================
 
-function renderTemperatureChart(data) {
+function renderTemperatureChart(data, weatherMain) {
   const canvas = document.getElementById("tempChart");
   if (!canvas) return;
 
@@ -139,6 +193,8 @@ function renderTemperatureChart(data) {
     tempChart.destroy();
   }
 
+  const gradient = getChartGradient(ctx, weatherMain);
+
   tempChart = new Chart(ctx, {
     type: "line",
     data: {
@@ -147,13 +203,22 @@ function renderTemperatureChart(data) {
         {
           label: "Suhu (°C)",
           data: temperatures,
-          borderWidth: 2,
+          borderColor: getChartBorderColor(weatherMain),
+          backgroundColor: gradient,
+          fill: true,
+          borderWidth: 3,
           tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: "#ffffff",
         },
       ],
     },
     options: {
       responsive: true,
+      animation: {
+        duration: 1200,
+        easing: "easeOutQuart",
+      },
       plugins: {
         legend: {
           labels: {
@@ -163,14 +228,12 @@ function renderTemperatureChart(data) {
       },
       scales: {
         x: {
-          ticks: {
-            color: "white",
-          },
+          ticks: { color: "white" },
+          grid: { display: false },
         },
         y: {
-          ticks: {
-            color: "white",
-          },
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.1)" },
         },
       },
     },
@@ -215,18 +278,19 @@ async function getWeather(city) {
 
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city},ID&appid=${apiKey}&units=metric`,
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`,
     );
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
+    const weatherMain = data.weather[0].main;
 
     showWeather(data);
-    changeBackground(data.weather[0].main);
+    changeBackground(weatherMain);
 
     localStorage.setItem("lastCity", city);
 
-    await getForecast(city);
+    await getForecast(city, weatherMain);
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -235,17 +299,17 @@ async function getWeather(city) {
   }
 }
 
-async function getForecast(city) {
+async function getForecast(city, weatherMain) {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city},ID&appid=${apiKey}&units=metric`,
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`,
     );
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
 
     showForecast(data);
-    renderTemperatureChart(data);
+    renderTemperatureChart(data, weatherMain);
   } catch (err) {
     console.log("Forecast error:", err.message);
   }
@@ -294,12 +358,14 @@ async function getWeatherByCoords(lat, lon) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
 
+    const weatherMain = data.weather[0].main;
+
     showWeather(data);
-    changeBackground(data.weather[0].main);
+    changeBackground(weatherMain);
 
     localStorage.setItem("lastCity", data.name);
 
-    await getForecastByCoords(lat, lon);
+    await getForecastByCoords(lat, lon, weatherMain);
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -308,7 +374,7 @@ async function getWeatherByCoords(lat, lon) {
   }
 }
 
-async function getForecastByCoords(lat, lon) {
+async function getForecastByCoords(lat, lon, weatherMain) {
   try {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
@@ -318,11 +384,12 @@ async function getForecastByCoords(lat, lon) {
     if (!response.ok) throw new Error(data.message);
 
     showForecast(data);
-    renderTemperatureChart(data);
+    renderTemperatureChart(data, weatherMain);
   } catch (err) {
     console.log("Forecast error:", err.message);
   }
 }
+
 document.getElementById("detectBtn").addEventListener("click", () => {
   navigator.geolocation.getCurrentPosition(
     (position) => {
