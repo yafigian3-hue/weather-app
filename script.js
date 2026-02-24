@@ -1,4 +1,5 @@
-const apiKey = "YOUR_API_KEY";
+let tempChart = null;
+const apiKey = "c77825cfb5c0fe2da389d1bd64f9dbcd";
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -113,6 +114,69 @@ function showForecast(data) {
   }, 50);
 }
 
+// ================= Render Temperature Chart =================
+
+function renderTemperatureChart(data) {
+  const canvas = document.getElementById("tempChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  const dailyData = data.list.filter((item) =>
+    item.dt_txt.includes("12:00:00"),
+  );
+
+  const labels = dailyData.slice(0, 5).map((day) => {
+    const date = new Date(day.dt_txt);
+    return date.toLocaleDateString("id-ID", { weekday: "short" });
+  });
+
+  const temperatures = dailyData
+    .slice(0, 5)
+    .map((day) => Math.round(day.main.temp));
+
+  if (tempChart) {
+    tempChart.destroy();
+  }
+
+  tempChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Suhu (°C)",
+          data: temperatures,
+          borderWidth: 2,
+          tension: 0.4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: "white",
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+        },
+        y: {
+          ticks: {
+            color: "white",
+          },
+        },
+      },
+    },
+  });
+}
+
 // ================= BACKGROUND =================
 
 function changeBackground(weatherMain) {
@@ -139,6 +203,11 @@ function changeBackground(weatherMain) {
 // ================= API =================
 
 async function getWeather(city) {
+  if (tempChart) {
+    tempChart.destroy();
+    tempChart = null;
+  }
+
   loading.classList.remove("hidden");
   error.classList.add("hidden");
   weatherResult.innerHTML = "";
@@ -150,14 +219,14 @@ async function getWeather(city) {
     );
 
     const data = await response.json();
-
     if (!response.ok) throw new Error(data.message);
 
     showWeather(data);
     changeBackground(data.weather[0].main);
-    getForecast(city);
 
     localStorage.setItem("lastCity", city);
+
+    await getForecast(city);
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -173,10 +242,10 @@ async function getForecast(city) {
     );
 
     const data = await response.json();
-
     if (!response.ok) throw new Error(data.message);
 
     showForecast(data);
+    renderTemperatureChart(data);
   } catch (err) {
     console.log("Forecast error:", err.message);
   }
@@ -207,6 +276,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function getWeatherByCoords(lat, lon) {
+  if (tempChart) {
+    tempChart.destroy();
+    tempChart = null;
+  }
+
   loading.classList.remove("hidden");
   error.classList.add("hidden");
   weatherResult.innerHTML = "";
@@ -218,14 +292,14 @@ async function getWeatherByCoords(lat, lon) {
     );
 
     const data = await response.json();
-
     if (!response.ok) throw new Error(data.message);
 
     showWeather(data);
-    changeBackground(data.weather[0].main); // FIXED
-    getForecastByCoords(lat, lon);
+    changeBackground(data.weather[0].main);
 
     localStorage.setItem("lastCity", data.name);
+
+    await getForecastByCoords(lat, lon);
   } catch (err) {
     error.textContent = err.message;
     error.classList.remove("hidden");
@@ -241,15 +315,14 @@ async function getForecastByCoords(lat, lon) {
     );
 
     const data = await response.json();
-
     if (!response.ok) throw new Error(data.message);
 
     showForecast(data);
+    renderTemperatureChart(data);
   } catch (err) {
     console.log("Forecast error:", err.message);
   }
 }
-
 document.getElementById("detectBtn").addEventListener("click", () => {
   navigator.geolocation.getCurrentPosition(
     (position) => {

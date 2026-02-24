@@ -22,7 +22,6 @@
   <body
     class="bg-slate-900 text-white min-h-screen flex items-center justify-center transition-colors duration-500"
   >
-  
     <div
       id="bgLayer"
       class="fixed inset-0 -z-10 opacity-100 transition-opacity duration-700"
@@ -62,8 +61,12 @@
 
       <div id="weatherResult" class="mt-4"></div>
       <div id="forecast" class="mt-6 grid grid-cols-5 gap-3 text-sm"></div>
+      <div class="mt-6">
+        <canvas id="tempChart"></canvas>
+      </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
