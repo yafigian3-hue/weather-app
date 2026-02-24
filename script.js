@@ -1,5 +1,5 @@
 let tempChart = null;
-const apiKey = "c77825cfb5c0fe2da389d1bd64f9dbcd";
+const apiKey = "YOUR_API_KEY";
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
