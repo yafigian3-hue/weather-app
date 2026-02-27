@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Weather App</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,52 +20,67 @@
       }
     </style>
   </head>
+
   <body
-    class="bg-slate-900 text-white min-h-screen flex items-center justify-center transition-colors duration-500"
+    class="bg-slate-900 text-white min-h-screen transition-colors duration-500 overflow-x-hidden"
   >
+    <!-- Background Layer -->
     <div
       id="bgLayer"
       class="fixed inset-0 -z-10 opacity-100 transition-opacity duration-700"
     ></div>
+
+    <!-- Wrapper -->
     <div
-      class="bg-slate-800/60 backdrop-blur-lg p-6 rounded-3xl shadow-2xl w-full max-w-md text-center"
+      class="w-full sm:flex sm:min-h-screen sm:items-center sm:justify-center sm:p-6"
     >
-      <h1 class="text-2xl font-bold mb-4">Weather App</h1>
-
-      <input
-        type="text"
-        id="cityInput"
-        placeholder="Masukkan kota"
-        class="w-full p-2 rounded-lg text-black mb-3"
-      />
-
-      <div id="searchHistory" class="mt-4 flex flex-wrap gap-2"></div>
-
-      <button
-        id="detectBtn"
-        class="bg-white/10 hover:bg-white/20 w-full py-2 rounded-lg font-semibold mt-2 transition"
+      <!-- Card -->
+      <div
+        class="bg-slate-800/60 backdrop-blur-lg w-full min-h-screen sm:min-h-0 sm:max-w-md text-center p-6 sm:rounded-3xl sm:shadow-2xl"
       >
-        📍 Detect Location
-      </button>
+        <h1 class="text-2xl font-bold mb-4">Weather App</h1>
 
-      <button
-        id="searchBtn"
-        class="bg-blue-500 hover:bg-blue-600 w-full py-2 rounded-lg font-semibold"
-      >
-        Cari
-      </button>
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Masukkan kota"
+          class="w-full p-2 rounded-lg text-black mb-3"
+        />
 
-      <p id="loading" class="hidden mt-3">
-        <span
-          class="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-        ></span>
-      </p>
-      <p id="error" class="hidden mt-3 text-red-400"></p>
+        <div id="searchHistory" class="mt-4 flex flex-wrap gap-2"></div>
 
-      <div id="weatherResult" class="mt-4"></div>
-      <div id="forecast" class="mt-6 grid grid-cols-5 gap-3 text-sm"></div>
-      <div class="mt-6">
-        <canvas id="tempChart"></canvas>
+        <button
+          id="detectBtn"
+          class="bg-white/10 hover:bg-white/20 w-full py-2 rounded-lg font-semibold mt-2 transition"
+        >
+          📍 Detect Location
+        </button>
+
+        <button
+          id="searchBtn"
+          class="bg-blue-500 hover:bg-blue-600 w-full py-2 rounded-lg font-semibold mt-2"
+        >
+          Cari
+        </button>
+
+        <p id="loading" class="hidden mt-3">
+          <span
+            class="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+          ></span>
+        </p>
+
+        <p id="error" class="hidden mt-3 text-red-400"></p>
+
+        <div id="weatherResult" class="mt-4"></div>
+
+        <div
+          id="forecast"
+          class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-3 text-sm"
+        ></div>
+
+        <div class="mt-6 h-64">
+          <canvas id="tempChart"></canvas>
+        </div>
       </div>
     </div>
 
