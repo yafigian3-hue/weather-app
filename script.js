@@ -1,5 +1,5 @@
 let tempChart = null;
-const apiKey = "YOUR_API_KEY"; // ganti denngan API key kamu sendiri dari OpenWeatherMap
+const apiKey = "c77825cfb5c0fe2da389d1bd64f9dbcd"; // ganti denngan API key kamu sendiri dari OpenWeatherMap
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -22,6 +22,44 @@ searchBtn.addEventListener("click", () => {
 cityInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") searchBtn.click();
 });
+
+// ================= Save History =================
+function saveSearchHistory(city) {
+  let history = JSON.parse(localStorage.getItem("weatherHistory")) || [];
+
+  history = history.filter((item) => item.toLowerCase() !== city.toLowerCase());
+
+  history.unshift(city);
+
+  if (history.length > 5) {
+    history.pop();
+  }
+
+  localStorage.setItem("weatherHistory", JSON.stringify(history));
+
+  renderSearchHistory();
+}
+
+// ================= Render History UI =================
+function renderSearchHistory() {
+  const history = JSON.parse(localStorage.getItem("weatherHistory")) || [];
+  const container = document.getElementById("searchHistory");
+
+  container.innerHTML = "";
+
+  history.forEach((city) => {
+    const button = document.createElement("button");
+    button.textContent = city;
+    button.className =
+      "bg-white/10 hover:bg-white/20 w-fit px-4 py-2 rounded-lg font-semibold mb-2 transition";
+
+    button.addEventListener("click", () => {
+      getWeather(city);
+    });
+
+    container.appendChild(button);
+  });
+}
 
 // ================= WEATHER =================
 
@@ -123,7 +161,6 @@ function showForecast(data) {
     `;
   });
 
-  
   setTimeout(() => {
     forecastContainer.querySelectorAll(".fade-enter").forEach((el) => {
       el.classList.add("fade-enter-active");
@@ -156,15 +193,15 @@ function getChartGradient(ctx, weatherMain) {
 
 function getChartBorderColor(weatherMain) {
   if (weatherMain === "Clear") {
-    return "#f97316"; 
+    return "#f97316";
   } else if (weatherMain === "Clouds") {
     return "#9ca3af";
   } else if (weatherMain === "Rain") {
-    return "#3b82f6"; 
+    return "#3b82f6";
   } else if (weatherMain === "Thunderstorm") {
     return "#8b5cf6";
   } else {
-    return "#cbd5e1"; 
+    return "#cbd5e1";
   }
 }
 
@@ -285,6 +322,7 @@ async function getWeather(city) {
     if (!response.ok) throw new Error(data.message);
     const weatherMain = data.weather[0].main;
 
+    saveSearchHistory(city);
     showWeather(data);
     changeBackground(weatherMain);
 
@@ -316,6 +354,8 @@ async function getForecast(city, weatherMain) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  renderSearchHistory();
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
