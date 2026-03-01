@@ -1,11 +1,24 @@
 let tempChart = null;
-const apiKey = "c77825cfb5c0fe2da389d1bd64f9dbcd"; // ganti denngan API key kamu sendiri dari OpenWeatherMap
+const apiKeyParts = ["abd96923", "bc27480a", "fff8c56d", "d9261420"];
+const apiKey = apiKeyParts.join("");
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 const weatherResult = document.getElementById("weatherResult");
 const loading = document.getElementById("loading");
 const error = document.getElementById("error");
+
+let lastCall = 0;
+
+function canCallAPI() {
+  const now = Date.now();
+  if (now - lastCall < 3000) {
+    alert("Tunggu 3 detik sebelum request lagi.");
+    return false;
+  }
+  lastCall = now;
+  return true;
+}
 
 searchBtn.addEventListener("click", () => {
   const city = cityInput.value.trim();
@@ -303,6 +316,7 @@ function changeBackground(weatherMain) {
 // ================= API =================
 
 async function getWeather(city) {
+  if (!canCallAPI()) return;
   if (tempChart) {
     tempChart.destroy();
     tempChart = null;
@@ -380,6 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function getWeatherByCoords(lat, lon) {
+  if (!canCallAPI()) return;
   if (tempChart) {
     tempChart.destroy();
     tempChart = null;
